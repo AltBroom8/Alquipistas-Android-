@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">AlquiPistas</string>
+    <string name="Login_Title">Login</string>
+    <string name="Login_Welcome">Bienvenido,</string>
+    <string name="Login_Header">Inicia sesión para continuar</string>
+    <string name="Login_Email">Email</string>
+    <string name="Login_Password">Contraseña</string>
+    <string name="hint_email">Introduce un email</string>
+    <string name="login_pass">Introduce contraseña</string>
+    <string name="mostrar_Password">Mostrar contraseña</string>
+    <string name="loginbutton_text">Iniciar Sesión</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="registro_header">Registro</string>
+    <string name="inicia_texto">Iniciar sesión</string>
+    <string name="nombre_completo">Nombre Completo</string>
+    <string name="nombre">Introduce tu nombre</string>
+    <string name="registro_usuario">Usuario</string>
+    <string name="type_username">Introduce tu usuario</string>
+    <string name="repeat_password">Repite Contraseña</string>
+    <string name="registrarme">Registrarme</string>
+</resources>
