@@ -5,7 +5,7 @@
     <string name="Login_Header">Inicia sesión para continuar</string>
     <string name="Login_Email">Email</string>
     <string name="Login_Password">Contraseña</string>
-    <string name="hint_email">Introduce un email</string>
+    <string name="hint_username">Introduce tu usuario</string>
     <string name="login_pass">Introduce contraseña</string>
     <string name="mostrar_Password">Mostrar contraseña</string>
     <string name="loginbutton_text">Iniciar Sesión</string>
@@ -18,4 +18,5 @@
     <string name="type_username">Introduce tu usuario</string>
     <string name="repeat_password">Repite Contraseña</string>
     <string name="registrarme">Registrarme</string>
+    <string name="email_hint">Introduce tu email</string>
 </resources>

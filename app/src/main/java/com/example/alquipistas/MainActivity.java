@@ -1,5 +1,8 @@
 package com.example.alquipistas;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -22,19 +25,26 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
-
+    private ApiRest myApi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
-        Consultor c = new Consultor();
-        Log.d("HOLAAAAAA","HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-
+        Log.d("Comienza","Aqui empieza el activity main");
+        //AL INICIAR LA APP BUSCO SI LA SESION YA ESTABA INICIADA
+        SharedPreferences sharedPreferences = this.getSharedPreferences("preferencias", Context.MODE_PRIVATE);
+        String nombreUsuario = sharedPreferences.getString("username", "");
+        //SI TENIA ALGO EN SHARED PREFERENCES CAMBIO DE ACTIVITY
+        if (!nombreUsuario.isEmpty()) {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            this.finish();
+        }
+        myApi = new ApiRest();
+        //CONFIGURACION CON VIEWPAGER Y TABLAYOUT
         ViewPager2 viewPager = findViewById(R.id.paginador);
-        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
+        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this,myApi);
         viewPager.setAdapter(pagerAdapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -55,20 +65,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private static class ScreenSlidePagerAdapter extends FragmentStateAdapter {
-        public ScreenSlidePagerAdapter(FragmentActivity fa) {
-            super(fa);
-        }
+        //CLASE PARA MANEJAR QUE FRAGMENT SE VE EN PANTALLA
+        private ApiRest api;
 
+        public ScreenSlidePagerAdapter(FragmentActivity fa, ApiRest api) {
+            super(fa);
+            this.api = api;
+        }
+        //EN FUNCION DE LA POSIICION, SE VE UN FRAGMENT U OTRO
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+
             Fragment fragment;
             switch (position) {
                 case 0:
-                    fragment = new Login();
+                    fragment = new Login(this.api);
                     break;
                 case 1:
-                    fragment = new Registro();
+                    fragment = new Registro(this.api);
                     break;
                 default:
                     fragment = null;
@@ -76,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return fragment;
         }
-
+        //DEVUELVE CUANTOS FRAGMENTS TENGO
         @Override
         public int getItemCount() {
             return 2;
