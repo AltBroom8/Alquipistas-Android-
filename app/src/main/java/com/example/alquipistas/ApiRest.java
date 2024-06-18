@@ -2,10 +2,14 @@ package com.example.alquipistas;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
 
 import com.google.gson.JsonObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,63 +30,13 @@ public class ApiRest {
         this.servicio = retrofit.create(Servicio.class);
     }
     //METODO PARA TESTING DE LA LIBRERIA RETROFIT
-    public void obtenerDatosTest() {
-        Call<JsonObject> call = servicio.test();
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    JsonObject resultado = response.body();
-                    String msg = resultado.get("mensaje").getAsString();
-                    Log.d("ApiRest", "Resultado de la solicitud: " + msg);
-                } else {
-                    Log.d("ApiRest", "Error en la solicitud: " + response.message());
-                }
-            }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-               Log.d("ApiError",t.getMessage());
-
-            }
-        });
-    }
-//METODO INICIO SESION
-    public void inicioSesion(String usuario, String password,final Consumer<Boolean> callback){
-        JsonObject json = new JsonObject();
-        json.addProperty("username", usuario);
-        json.addProperty("password", password);
-
-        Call<Boolean> call = servicio.login(json);
-        call.enqueue(new Callback<Boolean>() {
-            @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                if (response.isSuccessful()) {
-                    Boolean loginSuccessful = response.body();
-                    Log.d("ApiRest", "Booleano es: " + loginSuccessful);
-                    callback.accept(loginSuccessful);
-                } else {
-                    Log.d("ApiRest", "Error en el login arriba: " + response.message());
-                    callback.accept(false);
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
-                Log.d("ApiRest", "Error en el login abajo: " + t.getMessage());
-                callback.accept(false);
-
-            }
-        });
-    }
 //METODO PARA REGISTRAR UN NUEVO USUARIO
-    public void registro(String nombre,String usuario,String email, String password,final Consumer<Boolean> callback){
+    public void registro(String nombre,String usuario,String email,final Consumer<Boolean> callback){
         JsonObject json = new JsonObject();
-        json.addProperty("name", nombre);
-        json.addProperty("usuario", usuario);
-        json.addProperty("correo", email);
-        json.addProperty("pass", password);
+        json.addProperty("nombre", nombre);
+        json.addProperty("username", usuario);
+        json.addProperty("email", email);
 
         Call<Boolean> call = servicio.registro(json);
         call.enqueue(new Callback<Boolean>() {
@@ -123,7 +77,6 @@ public class ApiRest {
                 } else {
                     Log.d("ApiRest", "Error en el user arriba: " + response.message());
                     callback.accept(false);
-
                 }
             }
 
@@ -136,30 +89,171 @@ public class ApiRest {
         });
     }
 //METODO QUE COMPRUEBA SI UN MAIL YA ESTA EN LA BBDD
-    public void compruebaMail(String email,final Consumer<Boolean> callback){
+    public void getEscuelas(String username,final Consumer<List<Escuela>> callback){
         JsonObject json = new JsonObject();
-        json.addProperty("correo", email);
+        json.addProperty("username", username);
 
-        Call<Boolean> call = servicio.compruebaMail(json);
-        call.enqueue(new Callback<Boolean>() {
+        Call<List<Escuela>> call = servicio.getEscuelas(json);
+        call.enqueue(new Callback<List<Escuela>>() {
             @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+            public void onResponse(Call<List<Escuela>> call, Response<List<Escuela>>response) {
                 if (response.isSuccessful()) {
-                    Boolean respuesta = response.body();
-                    Log.d("ApiRest", "Booleano email es: " + respuesta);
-                    callback.accept(respuesta);
+                    List<Escuela> cursos = response.body();
+                    callback.accept(cursos);
                 } else {
                     Log.d("ApiRest", "Error en el email arriba: " + response.message());
-                    callback.accept(false);
+                    callback.accept(null);
 
                 }
             }
             @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
+            public void onFailure(Call<List<Escuela>> call, Throwable t) {
                 Log.d("ApiRest", "Error en el email abajo: " + t.getMessage());
-                callback.accept(false);
+                callback.accept(null);
 
             }
         });
     }
+
+    public void quitarEscuela(int idEscuela, int idUser){
+        JsonObject json = new JsonObject();
+        json.addProperty("idEscuela", idEscuela);
+        json.addProperty("idUser" , idUser);
+
+        Call<Boolean> call = servicio.quitarEscuela(json);
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    Boolean userLibre = response.body();
+                    Log.d("ApiRest", "Escuela eliminada es: " + userLibre);
+
+                } else {
+                    Log.d("ApiRest", "Error en la escuela arriba: " + response.message());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.d("ApiRest", "Error en el user abajo: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getInscripciones(String username,final Consumer<List<Escuela>> callback){
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+
+        Call<List<Escuela>> call = servicio.getInscripciones(json);
+        call.enqueue(new Callback<List<Escuela>>() {
+            @Override
+            public void onResponse(Call<List<Escuela>> call, Response<List<Escuela>>response) {
+                if (response.isSuccessful()) {
+                    List<Escuela> cursos = response.body();
+                    callback.accept(cursos);
+                } else {
+                    Log.d("ApiRest", "Error en la inscripcion arriba: " + response.message());
+                    callback.accept(null);
+
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Escuela>> call, Throwable t) {
+                Log.d("ApiRest", "Error en la inscripcion abajo: " + t.getMessage());
+                callback.accept(null);
+
+            }
+        });
+    }
+
+    public void inscribeUser(int idEscuela, String username){
+        JsonObject json = new JsonObject();
+        json.addProperty("escuelaId", idEscuela);
+        json.addProperty("user" , username);
+
+        Call<Boolean> call = servicio.inscribeUser(json);
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    Boolean userLibre = response.body();
+                    Log.d("ApiRest", "Inscripcion es: " + userLibre);
+
+                } else {
+                    Log.d("ApiRest", "Error en la inscripcion arriba: " + response.message());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.d("ApiRest", "Error en la inscripcion abajo: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getSocio(String username,final Consumer<Socio> callback){
+        JsonObject json = new JsonObject();
+        json.addProperty("username" , username);
+
+        Call<Socio> call = servicio.getSocio(json);
+        call.enqueue(new Callback<Socio>() {
+            @Override
+            public void onResponse(Call<Socio> call, Response<Socio>response) {
+                if (response.isSuccessful()) {
+                    Socio socio = response.body();
+                    callback.accept(socio);
+                } else {
+                    Log.d("ApiRest", "Error en la inscripcion arriba: " + response.message());
+                    callback.accept(null);
+
+                }
+            }
+            @Override
+            public void onFailure(Call<Socio> call, Throwable t) {
+                Log.d("ApiRest", "Error en la inscripcion abajo: " + t.getMessage());
+                callback.accept(null);
+
+            }
+        });
+    }
+
+    public void updateUser(String nombre,String apellidos,int cp,String email, Date date,int id){
+        JsonObject json = new JsonObject();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String dateString = dateFormat.format(date);
+        json.addProperty("nombre", nombre);
+        json.addProperty("apellidos" , apellidos);
+        json.addProperty("cp", cp);
+        json.addProperty("email" , email);
+        json.addProperty("date", dateString);
+        json.addProperty("id", id);
+
+        Call<Boolean> call = servicio.updateUser(json);
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    Boolean userLibre = response.body();
+                    Log.d("ApiRest", "Update es: " + userLibre);
+
+                } else {
+                    Log.d("ApiRest", "Error en la update arriba: " + response.message());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.d("ApiRest", "Error en la update abajo: " + t.getMessage());
+            }
+        });
+    }
+
+
+
+
+
+
 }

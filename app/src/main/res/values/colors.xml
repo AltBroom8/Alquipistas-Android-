@@ -5,4 +5,6 @@
     <color name="gray">#b3b3b3</color>
     <color name="hintcolor">#81FFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="azulito">#2b79ff</color>
+    <color name="rojito">#ce4a5a</color>
 </resources>

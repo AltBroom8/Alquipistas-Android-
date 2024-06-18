@@ -71,27 +71,24 @@ public class Login extends Fragment {
                     new AlertDialog.Builder(getActivity())
                             .setTitle("Error")
                             .setMessage("El campo usuario está vacío")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Aquí puedes realizar alguna acción adicional si es necesario
-                                }
-                            })
+                            .setPositiveButton(android.R.string.ok, null)
                             .show();
                 }else if(password.isEmpty()){
                     new AlertDialog.Builder(getActivity())
                             .setTitle("Error")
                             .setMessage("El campo contraseña está vacío")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Aquí puedes realizar alguna acción adicional si es necesario
-                                }
-                            })
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
+                }else if(!(user.equals(password))){
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Error")
+                            .setMessage("La contraseña debe ser identica al usuario")
+                            .setPositiveButton(android.R.string.ok, null)
                             .show();
                 }else{
                     //VALIDAMOS SI LOS DATOS SON CORRECTOS
-                    myApi.inicioSesion(user,password,loginCorrecto->{
-                        String titulo = "";
-                        String msg = "";
+                    myApi.CompruebaUser(user,loginCorrecto->{
+
                         //CAMBIO DE ACTIVITY SI SON CORRECTOS
                         if (loginCorrecto){
                             SharedPreferences sharedPreferences = getActivity().getSharedPreferences("preferencias", Context.MODE_PRIVATE);
@@ -103,17 +100,13 @@ public class Login extends Fragment {
                             getActivity().finish();
 
                         }else {
-                            titulo = "Error";
-                            msg = "Acceso denegado";
+                            String titulo = "Error";
+                            String msg = "Acceso denegado";
                             //EN  CASO CONTRARIO LANZO ALERTDIALOG
                             new AlertDialog.Builder(getActivity())
                                     .setTitle(titulo)
                                     .setMessage(msg)
-                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    })
+                                    .setPositiveButton(android.R.string.ok,null)
                                     .show();
                         }
                     });

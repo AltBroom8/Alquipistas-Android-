@@ -19,4 +19,8 @@
     <string name="repeat_password">Repite Contraseña</string>
     <string name="registrarme">Registrarme</string>
     <string name="email_hint">Introduce tu email</string>
+    <string name="escuelas">Escuelas</string>
+    <string name="escuelasde">"Escuelas de "</string>
+    <string name="inscribete">Inscríbete</string>
+
 </resources>

@@ -2,31 +2,38 @@ package com.example.alquipistas;
 
 import com.google.gson.JsonObject;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface Servicio {
     //POSIBLES CONSULTAS POR POST A LA API
-    @POST("/login")
-    Call<Boolean> login(@Body JsonObject datos);
 
-    @POST("/actualizaPass")
-    Call<Void> actualizaPass(@Body String datos);
-
-    @POST("/compruebaUsername")
+    @POST("/existeSocioPorUsername")
     Call<Boolean>CompruebaUser(@Body JsonObject datos);
 
-    @POST("/compruebaMail")
-    Call<Boolean> compruebaMail(@Body JsonObject datos);
+    @POST ("/escuelasPorUsuario")
+    Call<List<Escuela>> getEscuelas(@Body JsonObject datos);
 
-    @POST("/registro")
+    @POST("/registroMovil")
     Call<Boolean> registro(@Body JsonObject datos);
 
-    @POST("/enviaEmail")
-    Call<Boolean> enviaEmail(@Body String datos);
-    @POST("/inicializar")
-    Call<Boolean> inicializar(@Body String datos);
-    @POST("/test")
-    Call<JsonObject> test();
+    @POST("/quitarEscuela")
+    Call<Boolean>quitarEscuela(@Body JsonObject datos);
+
+    @POST ("/listadoInscripciones")
+    Call<List<Escuela>> getInscripciones(@Body JsonObject datos);
+
+    @POST("/inscribeUser")
+    Call<Boolean>inscribeUser(@Body JsonObject datos);
+
+    @POST("/getSocioPorUsername")
+    Call<Socio>getSocio(@Body JsonObject datos);
+
+    @POST("/updateSocioMovil")
+    Call<Boolean>updateUser(@Body JsonObject datos);
+
+
 }

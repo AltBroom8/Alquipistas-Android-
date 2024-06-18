@@ -22,11 +22,9 @@ import java.util.regex.Pattern;
 public class Registro extends Fragment {
     //DECLARACIONES
     ApiRest myApi;
-    ImageView ojo;
     EditText nombre;
     EditText username;
     EditText email;
-    EditText password;
     Button btn;
     boolean oculto = false;
     //CONSTRUCTOR QUE RECIBE LA API
@@ -39,14 +37,13 @@ public class Registro extends Fragment {
                              Bundle savedInstanceState) {
         //INICIALIZAMOS VARIABLES Y CONFIGURACION INICIAL DE CONTRASEÑA
         View view = inflater.inflate(R.layout.fragment_registro, container, false);
-        ojo = view.findViewById(R.id.ojo);
-        password = view.findViewById(R.id.password);
+
+
         nombre = view.findViewById(R.id.nombre);
         email = view.findViewById(R.id.email);
         username = view.findViewById(R.id.username);
         btn = view.findViewById(R.id.btn);
-        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        password.setTypeface(Typeface.SANS_SERIF);
+
 
         //METODO QUE MANEJA EL BOTON DE REGISTRAR
         btn.setOnClickListener(v->{
@@ -54,19 +51,19 @@ public class Registro extends Fragment {
             String[] regex = {
                     "^([A-Za-zÑñÁáÉéÍíÓóÚú]+['\\-]{0,1}[A-Za-zÑñÁáÉéÍíÓóÚú]+)(\\s+([A-Za-zÑñÁáÉéÍíÓóÚú]+['\\-]{0,1}[A-Za-zÑñÁáÉéÍíÓóÚú]+))*$",
                     "^[a-zA-Z0-9]{5,}$",
-                    "^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail|yahoo|aol|icloud|live|msn|mail|yandex|protonmail|inbox)\\.(com|es|net|org|info|gov|edu)$",
-                    "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{8,}$"
+                    "^[a-zA-Z0-9._%+-]+@(gmail|outlook|hotmail|yahoo|aol|icloud|live|msn|mail|yandex|protonmail|inbox)\\.(com|es|net|org|info|gov|edu)$"
             };
             //LISTA DE EDITTEXT
             EditText[] inputs = {
-                    nombre,username,email,password
+                    nombre,username,email
             };
             //CAMPOS EXISTENTES
-            String[] campos = {"nombre", "usuario", "email", "contraseña"};
+            String[] campos = {"nombre", "usuario", "email"};
             //MANEJA QUE NINGUN CAMPO ESTÉ VACIO
             for (int i = 0; i < campos.length; i++) {
                 if (String.valueOf(inputs[i].getText()).isEmpty()) {
                     mostrarErrorVacio(campos[i]);
+                    Log.d("vacio","vuelve en vacio");
                     return;
                 }
             }
@@ -76,7 +73,6 @@ public class Registro extends Fragment {
                 Matcher matcher = pattern.matcher(String.valueOf(inputs[i].getText()));
 
                 if(!matcher.matches()){
-                    Log.d("Campo",campos[i]);
                     mostrarErrorRegex(i,campos[i]);
                     return;
                 }
@@ -84,19 +80,14 @@ public class Registro extends Fragment {
             //HILO SECUNDARIO PARA NO BLOQUEAR LA APP AL HACER AWAIT
             new Thread(() -> {
                 // Variables para almacenar los resultados de las llamadas
-                boolean[] userRegistrado = {false};
-                boolean[] emailRegistrado = {false};
-
+                boolean[] userRegistrado = {true};
                 // Iniciar las llamadas asincrónicas a CompruebaUser
-                CountDownLatch latch = new CountDownLatch(2);
+                CountDownLatch latch = new CountDownLatch(1);
                 myApi.CompruebaUser(String.valueOf(inputs[1].getText()), resultado -> {
                     userRegistrado[0] = resultado;
                     latch.countDown();
                 });
-                myApi.compruebaMail(String.valueOf(inputs[2].getText()), resultado -> {
-                    emailRegistrado[0] = resultado;
-                    latch.countDown();
-                });
+
 
                 try {
                     latch.await();
@@ -105,17 +96,17 @@ public class Registro extends Fragment {
                 }
                 //OPERACIONES EN EL HILO PRINCIPAL DE LA APP
                 getActivity().runOnUiThread(() -> {
-                    if (!userRegistrado[0]) {
+                    if (userRegistrado[0]) {
                         mostrarErrorYaRegistrado(campos[1]);
-                        return;
-                    } else if (!emailRegistrado[0]) {
-                        mostrarErrorYaRegistrado(campos[2]);
+                        Log.d("user","vuelve en user ya registrado");
                         return;
                     }
+                    Log.d("datos", inputs[0].getText() +" "+ inputs[1].getText() +" "+
+                            inputs[2].getText());
                     myApi.registro(String.valueOf(inputs[0].getText()),String.valueOf(inputs[1].getText()),
-                            String.valueOf(inputs[2].getText()),String.valueOf(inputs[3].getText()),
-                            resultado ->{
-                                if(resultado){
+                            String.valueOf(inputs[2].getText()), resultado ->{
+                                Log.d("REGISTRANDO","ENTRA, resultado es "+ resultado);
+
                                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("preferencias", Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("username", String.valueOf(inputs[1].getText()));
@@ -123,7 +114,6 @@ public class Registro extends Fragment {
                                     Intent intent = new Intent(getActivity(), Home.class);
                                     startActivity(intent);
                                     getActivity().finish();
-                                }
 
                             });
 
@@ -132,27 +122,10 @@ public class Registro extends Fragment {
                 });
             }).start();
         });
-
-        //METODO PARA MOSTRAR LA CONTRASEÑA
-        ojo.setOnClickListener(v -> {
-            if(!oculto){
-                ojo.setImageResource(R.drawable.hide_password);
-                password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
-                oculto=true;
-
-            }else{
-                ojo.setImageResource(R.drawable.show_password);
-                password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                oculto=false;
-            }
-            password.setSelection(password.length());
-            password.setTypeface(Typeface.SANS_SERIF);
-
-        });
-
         //DEVOLVEMOS LA VISTA AL MAIN ACTIVITY
         return view;
     }
+
     //Metodo que muestra un error en Pantalla relacionado con un campo vacío
     private void mostrarErrorVacio(String campo) {
         new AlertDialog.Builder(getActivity())
@@ -163,12 +136,9 @@ public class Registro extends Fragment {
     }
     //Metodo que muestra un error en Pantalla relacionado con los requisitos de las regex
     private void mostrarErrorRegex(int id, String campo) {
-        String info = (id!=3)?"":":\n-Al menos 8 caracteres de longitud\n" +
-                "-Al menos una letra minúscula\n-Al menos una letra mayúscula\n" +
-                "-Al menos un dígito numérico\n-Al menos un carácter especial";
         new AlertDialog.Builder(getActivity())
                 .setTitle("Error")
-                .setMessage("El campo " + campo + " no es válido"+info)
+                .setMessage("El campo " + campo + " no es válido")
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
     }
